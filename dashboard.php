@@ -16,7 +16,10 @@ include 'includes/cek_session.php';
                <li><a href="kelola_guru.php">Kelola Guru</a></li>
                <li><a href="kelola_siswa.php">Kelola Siswa</a></li>
                <li><a href="kelola_kelas.php">Kelola Kelas</a></li>
-               <li><a href="menu4.php">Menu 4</a></li>
+               <li><a href="kelola_tahun_ajaran.php">Kelola Tahun Ajaran</a></li>
+               <li><a href="kelola_walikelas.php">Kelola Walikelas</a></li>
+               <li><a href="penempatan_siswa.php">Penempatan Siswa</a></li>
+               <li><a href="kelola_pelanggaran_kategori.php">Pelanggaran Lategori</a></li>
             <?php } ?>
 
             <?php if ($_SESSION['role'] == 'guru') { ?>
