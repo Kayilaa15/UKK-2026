@@ -69,9 +69,9 @@ include 'includes/cek_session.php';
         </div>
         <!-- KONTEN -->
         <main class="col-md-9 col-lg-10 p-4">
-            <h2>Data Guru</h2>
+            <h2>Dashboard</h2>
             <p>
-                Selamat datang di halaman data guru
+                Selamat datang di halaman dashboard
             </p>
             <div class="row">
                 <!-- CARD DATA SISWA -->
