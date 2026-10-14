@@ -14,7 +14,7 @@ if ($tanggal_selesai < $tanggal_mulai) {
     exit('Tanggal selesai tidak boleh lebih awal dari tanggal mulai.');
 }
 
-$sql = "INSERT INTO t_walikelas
+$sql = "INSERT INTO t_wali_kelas
         (tahun_ajaran_id, kelas_id, guru_id,
          tanggal_mulai, tanggal_selesai, status_aktif)
         VALUES (?, ?, ?, ?, ?, ?)";

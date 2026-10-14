@@ -13,7 +13,7 @@ $sql = "UPDATE t_guru SET
         nip = '$nip',
         nama = '$nama',
         email = '$email',
-        status_aktif = '$status_aktif',
+        status_aktif = '$status_aktif'
         WHERE id = '$id'";
 
 $hasil = mysqli_query($koneksi, $sql);
