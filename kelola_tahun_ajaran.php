@@ -18,60 +18,9 @@ $hasil = mysqli_query($koneksi, $sql);
 <body>
     <div class="container-fluid">
     <div class="row">
-        <!-- SIDEBAR -->
-        <div class="col-md-3 col-lg-2 bg-dark min-vh-100 p-3">
-            <h4 class="text-white mb-4">
-                Pelanggaran Siswa
-            </h4>
-            <ul class="nav nav-pills flex-column">
-                <li class="nav-item mb-2">
-                    <a href="dashboard.php" class="nav-link text-white">
-                        Dashboard
-                    </a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a href="kelola_siswa.php" class="nav-link text-white">
-                        Data Siswa
-                    </a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a href="kelola_guru.php" class="nav-link text-white">
-                        Data Guru
-                    </a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a href="kelola_kelas.php" class="nav-link text-white">
-                        Data Kelas
-                    </a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a href="kelola_tahun_ajaran.php" class="nav-link active">
-                        Data Tahun Ajaran
-                    </a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a href="kelola_walikelas.php" class="nav-link text-white">
-                        Data Wali Kelas
-                    </a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a href="penempatan_siswa.php" class="nav-link text-white">
-                        Penempatan Siswa
-                    </a>
-                </li>
-                 <li class="nav-item mb-2">
-                    <a href="kelola_pelanggaran_kategori.php" class="nav-link text-white">
-                        Kategori Pelanggaran
-                    </a>
-                </li>
-                <hr class="text-secondary">
-                <li class="nav-item">
-                    <a href="#" class="nav-link text-danger">
-                        Logout
-                    </a>
-                </li>
-            </ul>
-        </div>
+        <?php
+            include 'layout/sidebar.php';
+        ?>
         <!-- KONTEN -->
         <main class="col-md-9 col-lg-10 p-4">
            
