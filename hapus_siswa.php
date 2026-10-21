@@ -25,15 +25,9 @@ if (mysqli_query($koneksi, $sql)) {
 
     $aktivitas = "hapus siswa: " . $data['nama'];
 
-    // Simpan aktivitas ke tabel log
-    $log = "INSERT INTO tbl_log
-            (id_user, aktivitas, waktu)
-            VALUES
-            ('$id_user', '$aktivitas', '$waktu')";
-
-    mysqli_query($koneksi, $log);
 }
 
+// Kembali ke halaman kelola siswa
 header('Location: kelola_siswa.php');
 exit;
 ?>
