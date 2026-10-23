@@ -1,5 +1,5 @@
 <?php
-// proses_edit_walikelas.php
+// proses_edit_wali_kelas.php
 include 'includes/cek_session.php';
 include 'config/koneksi.php';
 
@@ -15,7 +15,7 @@ if ($tanggal_selesai < $tanggal_mulai) {
     exit('Tanggal selesai tidak boleh lebih awal dari tanggal mulai.');
 }
 
-$sql = "UPDATE t_walikelas SET
+$sql = "UPDATE t_wali_kelas SET
         tahun_ajaran_id = ?,
         kelas_id = ?,
         guru_id = ?,
@@ -40,7 +40,7 @@ mysqli_stmt_bind_param(
 );
 
 if (mysqli_stmt_execute($stmt)) {
-    header("Location: kelola_walikelas.php");
+    header("Location: kelola_wali_kelas.php");
     exit;
 } else {
     echo "Gagal mengubah data wali kelas: "

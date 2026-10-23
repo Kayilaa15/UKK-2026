@@ -59,7 +59,7 @@ $hasil = mysqli_query($koneksi, $sql);
 
                             <thead class="table-dark">
                                 <tr>
-                                    <th>ID</th>
+                                    <th>No </th>
                                     <th>NIS</th>
                                     <th>NISN</th>
                                     <th>Nama Siswa</th>
@@ -76,9 +76,8 @@ $hasil = mysqli_query($koneksi, $sql);
                             <?php while ($row = mysqli_fetch_assoc($hasil)) { ?>
 
                                 <tr>
-                                    <td>
-                                        <?= htmlspecialchars($row['id']) ?>
-                                    </td>
+                                <!--Nomor urut otomatis-->
+                                    <td></td>
 
                                     <td>
                                         <?= htmlspecialchars($row['nis'] ?? '') ?>
@@ -170,11 +169,11 @@ $hasil = mysqli_query($koneksi, $sql);
 <!-- DataTables Bootstrap 5 -->
 <script src="https://cdn.datatables.net/2.3.4/js/dataTables.bootstrap5.min.js"></script>
 
-<!-- Inisialisasi DataTables -->
 <script>
 $(document).ready(function () {
 
-    $('#tabelSiswa').DataTable({
+    // Inisialisasi DataTables
+    var tabel = $('#tabelSiswa').DataTable({
 
         language: {
             search: "Cari:",
@@ -201,7 +200,7 @@ $(document).ready(function () {
 
         columnDefs: [
             {
-                targets: 8,
+                targets: [0, 8],
                 orderable: false,
                 searchable: false
             }
@@ -209,8 +208,32 @@ $(document).ready(function () {
 
     });
 
+    // Fungsi nomor urut otomatis
+    function nomorUrut() {
+
+        var informasi = tabel.page.info();
+
+        tabel
+            .column(0, {
+                search: 'applied',
+                order: 'applied'
+            })
+            .nodes()
+            .each(function (cell, i) {
+
+                cell.textContent = informasi.start + i + 1;
+
+            });
+    }
+
+    // Perbarui nomor urut setiap tabel berubah
+    tabel.on('draw.dt', function () {
+        nomorUrut();
+    });
+
+    // Tampilkan nomor urut saat halaman pertama dibuka
+    nomorUrut();
+
 });
 </script>
 
-</body>
-</html>

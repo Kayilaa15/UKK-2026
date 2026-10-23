@@ -1,5 +1,5 @@
 <?php
-// hapus_walikelas.php
+// hapus_wali_kelas.php
 include 'includes/cek_session.php';
 include 'config/koneksi.php';
 
@@ -27,7 +27,7 @@ if (!$data) {
 // Hapus data
 $hapus = mysqli_prepare(
     $koneksi,
-    "DELETE FROM t_walikelas WHERE id = ?"
+    "DELETE FROM t_wali_kelas WHERE id = ?"
 );
 mysqli_stmt_bind_param($hapus, "i", $id);
 
@@ -55,7 +55,7 @@ if (mysqli_stmt_execute($hapus)) {
         mysqli_stmt_execute($log);
     }
 
-    header('Location: kelola_walikelas.php');
+    header('Location: kelola_wali_kelas.php');
     exit;
 } else {
     echo "Gagal menghapus wali kelas: " . mysqli_error($koneksi);

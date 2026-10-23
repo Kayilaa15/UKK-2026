@@ -1,76 +1,128 @@
-
 <?php
 // tambah_tahun_ajaran.php
-
 include 'includes/cek_session.php';
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="id">
+
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Tambah Tahun Ajaran</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+          rel="stylesheet">
 </head>
+
 <body>
 
-    <h1>Tambah Tahun Ajaran</h1>
+<div class="container-fluid">
+    <div class="row">
 
-    <form action="proses_tambah_tahun_ajaran.php" method="POST">
+        <?php include 'layout/sidebar.php'; ?>
 
-        <table>
+        <!-- KONTEN -->
+        <main class="col-md-9 col-lg-10 p-4">
 
-            <tr>
-                <td>Nama Tahun Ajaran</td>
-                <td>:</td>
-                <td>
-                    <input type="text" name="nama"
-                           placeholder="Contoh: 2026/2027"
-                           maxlength="20" required>
-                </td>
-            </tr>
+            <h1 class="mb-4">Tambah Tahun Ajaran</h1>
 
-            <tr>
-                <td>Tanggal Mulai</td>
-                <td>:</td>
-                <td>
-                    <input type="date" name="tanggal_mulai"
-                           required>
-                </td>
-            </tr>
+            <div class="mb-3">
+                <a href="kelola_tahun_ajaran.php" class="btn btn-secondary">
+                    Kembali ke Data Tahun Ajaran
+                </a>
+            </div>
 
-            <tr>
-                <td>Tanggal Selesai</td>
-                <td>:</td>
-                <td>
-                    <input type="date" name="tanggal_selesai"
-                           required>
-                </td>
-            </tr>
+            <!-- FORM TAMBAH TAHUN AJARAN -->
+            <div class="card shadow-sm mb-4">
 
-            <tr>
-                <td>Status Aktif</td>
-                <td>:</td>
-                <td>
-                    <select name="status_aktif" required>
-                        <option value="1">Aktif</option>
-                        <option value="0">Tidak Aktif</option>
-                    </select>
-                </td>
-            </tr>
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Form Tambah Tahun Ajaran</h5>
+                </div>
 
-            <tr>
-                <td colspan="3">
-                    <input type="submit" value="Simpan">
-                </td>
-            </tr>
+                <div class="card-body">
 
-        </table>
+                    <form action="proses_tambah_tahun_ajaran.php" method="POST">
 
-    </form>
+                        <!-- Nama Tahun Ajaran -->
+                        <div class="mb-3">
+                            <label for="nama" class="form-label">
+                                Nama Tahun Ajaran
+                            </label>
 
-    <p>
-        <a href="kelola_tahun_ajaran.php">Kembali</a>
-    </p>
+                            <input type="text"
+                                   name="nama"
+                                   id="nama"
+                                   class="form-control"
+                                   placeholder="Contoh: 2026/2027"
+                                   maxlength="20"
+                                   required>
+                        </div>
+
+                        <!-- Tanggal Mulai -->
+                        <div class="mb-3">
+                            <label for="tanggal_mulai" class="form-label">
+                                Tanggal Mulai
+                            </label>
+
+                            <input type="date"
+                                   name="tanggal_mulai"
+                                   id="tanggal_mulai"
+                                   class="form-control"
+                                   required>
+                        </div>
+
+                        <!-- Tanggal Selesai -->
+                        <div class="mb-3">
+                            <label for="tanggal_selesai" class="form-label">
+                                Tanggal Selesai
+                            </label>
+
+                            <input type="date"
+                                   name="tanggal_selesai"
+                                   id="tanggal_selesai"
+                                   class="form-control"
+                                   required>
+                        </div>
+
+                        <!-- Status Aktif -->
+                        <div class="mb-3">
+                            <label for="status_aktif" class="form-label">
+                                Status Aktif
+                            </label>
+
+                            <select name="status_aktif"
+                                    id="status_aktif"
+                                    class="form-select"
+                                    required>
+                                <option value="1">Aktif</option>
+                                <option value="0">Tidak Aktif</option>
+                            </select>
+                        </div>
+
+                        <!-- Tombol Simpan -->
+                        <button type="submit" class="btn btn-primary">
+                            Simpan
+                        </button>
+
+                        <a href="kelola_tahun_ajaran.php"
+                           class="btn btn-secondary">
+                            Batal
+                        </a>
+
+                    </form>
+
+                </div>
+            </div>
+
+        </main>
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>
-

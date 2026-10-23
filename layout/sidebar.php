@@ -47,8 +47,8 @@ if ($_SESSION['role'] === "admin") {
             </li>
 
             <li class="nav-item mb-2">
-                <a href="kelola_walikelas.php"
-                   class="nav-link <?= ($current_page == 'kelola_walikelas.php') ? 'active' : 'text-white' ?>">
+                <a href="kelola_wali_kelas.php"
+                   class="nav-link <?= ($current_page == 'kelola_wali_kelas.php') ? 'active' : 'text-white' ?>">
                     Data Wali Kelas
                 </a>
             </li>
@@ -64,6 +64,12 @@ if ($_SESSION['role'] === "admin") {
                 <a href="kelola_pelanggaran_kategori.php"
                    class="nav-link <?= ($current_page == 'kelola_pelanggaran_kategori.php') ? 'active' : 'text-white' ?>">
                     Kategori Pelanggaran
+                </a>
+            </li>
+            <li class="nav-item mb-2">
+                <a href="kelola_jenis_pelanggaran.php"
+                   class="nav-link <?= ($current_page == 'kelola_jenis_pelanggaran.php') ? 'active' : 'text-white' ?>">
+                    Jenis Pelanggaran
                 </a>
             </li>
 
