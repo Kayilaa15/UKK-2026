@@ -89,6 +89,26 @@ include 'includes/cek_session.php';
                                    maxlength="150"
                                    required>
                         </div>
+                        <!-- PASSWORD -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                        <label class="form-label">Password</label>
+                        <input type="password" name="password"
+                               class="form-control"
+                               placeholder="Masukkan Password"
+                               minlength="6"
+                               required>
+                    </div>
+
+                    <!-- Konfirmasi Password -->
+                    <div class="col-md-6">
+                        <label class="form-label">Konfirmasi Password</label>
+                        <input type="password" name="konfirmasi_password"
+                               class="form-control"
+                               placeholder="Ulangi Password"
+                               minlength="6"
+                               required>
+                    </div>
 
                         <!-- STATUS AKTIF -->
                         <div class="mb-3">

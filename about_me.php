@@ -54,7 +54,7 @@ include 'includes/cek_session.php';
                             <!-- Foto Profil -->
                             <div class="col-md-4 text-center mb-4">
                                 <img
-                                    src="assets/foto_profil.jpg"
+                                    src="asset/pp.jpeg"
                                     alt="Foto Profil"
                                     class="img-fluid rounded-circle img-thumbnail mb-3"
                                     width="220">
