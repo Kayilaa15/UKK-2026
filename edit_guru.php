@@ -92,16 +92,24 @@ if (!$data) {
                                name="id"
                                value="<?= (int) $data['id']; ?>">
 
+                        
                         <!-- NIP -->
                         <div class="mb-3">
                             <label for="nip" class="form-label">NIP</label>
 
                             <input type="text"
-                                   class="form-control"
-                                   id="nip"
-                                   name="nip"
-                                   value="<?= htmlspecialchars($data['nip'] ?? ''); ?>"
-                                   required>
+                                class="form-control"
+                                id="nip"
+                                name="nip"
+                                maxlength="18"
+                                pattern="[0-9]{1,18}"
+                                inputmode="numeric"
+                                title="NIP harus berupa angka maksimal 18 digit"
+                                oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 18)"
+                                value="<?= htmlspecialchars($data['nip'] ?? ''); ?>"
+                                required>
+
+                            <small class="text-muted">NIP maksimal 18 digit.</small>
                         </div>
 
                         <!-- Nama Guru -->

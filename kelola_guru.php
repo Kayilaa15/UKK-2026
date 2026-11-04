@@ -43,7 +43,7 @@ $hasil = mysqli_query($koneksi, $sql);
                 </a>
 
                 <a href="tambah_guru.php" class="btn btn-primary">
-                    Tambah Guru
+                    +Tambah Guru
                 </a>
             </div>
 

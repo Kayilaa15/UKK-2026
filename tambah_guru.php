@@ -54,17 +54,16 @@ include 'includes/cek_session.php';
 
                     <form action="proses_tambah_guru.php" method="POST">
 
-                        <!-- NIP -->
-                        <div class="mb-3">
-                            <label for="nip" class="form-label">NIP</label>
-
-                            <input type="text"
-                                   name="nip"
-                                   id="nip"
-                                   class="form-control"
-                                   maxlength="30"
-                                   required>
-                        </div>
+            <!-- NIP -->
+            <div class="col-md-6">
+                <label class="form-label">NIP</label>
+                <input type="text" name="nip"
+                    class="form-control"
+                    placeholder="Masukkan NIP"
+                    maxlength="18"
+                    required>
+                <small class="text-muted">NIP maksimal 18 digit.</small>
+            </div>
 
                         <!-- NAMA GURU -->
                         <div class="mb-3">

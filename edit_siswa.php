@@ -94,25 +94,31 @@ if (!$data) {
                         <!-- NIS -->
                         <div class="mb-3">
                             <label for="nis" class="form-label">NIS</label>
-
-                            <input type="text"
-                                   class="form-control"
-                                   id="nis"
-                                   name="nis"
-                                   value="<?= htmlspecialchars($data['nis'] ?? ''); ?>"
-                                   required>
+                            <input type="text" name="nis"
+                                id="nis"
+                                class="form-control"
+                                maxlength="15"
+                                pattern="[0-9]{1,15}"
+                                inputmode="numeric"
+                                oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,15)"
+                                value="<?= htmlspecialchars($data['nis'] ?? '') ?>"
+                                required>
+                            <small class="text-muted">NIS maksimal 15 digit.</small>
                         </div>
 
                         <!-- NISN -->
                         <div class="mb-3">
                             <label for="nisn" class="form-label">NISN</label>
-
-                            <input type="text"
-                                   class="form-control"
-                                   id="nisn"
-                                   name="nisn"
-                                   value="<?= htmlspecialchars($data['nisn'] ?? ''); ?>"
-                                   required>
+                            <input type="text" name="nisn"
+                                id="nisn"
+                                class="form-control"
+                                maxlength="10"
+                                pattern="[0-9]{1,10}"
+                                inputmode="numeric"
+                                oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,10)"
+                                value="<?= htmlspecialchars($data['nisn'] ?? '') ?>"
+                                required>
+                            <small class="text-muted">NISN maksimal 10 digit.</small>
                         </div>
 
                         <!-- Nama Siswa -->

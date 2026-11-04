@@ -72,7 +72,7 @@ $guru = mysqli_query(
 
                 <div class="card-body">
 
-                    <form action="proses_tambah_walikelas.php"
+                    <form action="proses_tambah_wali_kelas.php"
                           method="POST">
 
                         <!-- TAHUN AJARAN -->
