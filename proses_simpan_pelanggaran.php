@@ -1,6 +1,7 @@
 
 <?php
 // proses_simpan_pelanggaran.php
+
 include 'includes/cek_session.php';
 include 'config/koneksi.php';
 
@@ -9,13 +10,18 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
+// Ambil data dari form
 $siswa_id = filter_input(INPUT_POST, 'siswa_id', FILTER_VALIDATE_INT);
 $tahun_id = filter_input(INPUT_POST, 'tahun_ajaran_id', FILTER_VALIDATE_INT);
 $kelas_id = filter_input(INPUT_POST, 'kelas_id', FILTER_VALIDATE_INT);
 $pelanggaran_id = filter_input(INPUT_POST, 'pelanggaran_id', FILTER_VALIDATE_INT);
+
 $kategori_id = filter_input(
-    INPUT_POST, 'pelanggaran_kategori_id', FILTER_VALIDATE_INT
+    INPUT_POST,
+    'pelanggaran_kategori_id',
+    FILTER_VALIDATE_INT
 );
+
 $guru_id = filter_input(INPUT_POST, 'guru_id', FILTER_VALIDATE_INT);
 $poin = filter_input(INPUT_POST, 'poin', FILTER_VALIDATE_INT);
 
@@ -26,6 +32,7 @@ $status = $_POST['status'] ?? '';
 
 $status_diizinkan = ['Ditindaklanjuti', 'Proses', 'Selesai'];
 
+// Validasi data
 if (
     !$siswa_id || !$tahun_id || !$kelas_id ||
     !$pelanggaran_id || !$kategori_id || !$guru_id ||
@@ -37,6 +44,7 @@ if (
     exit;
 }
 
+// Validasi tanggal
 $format_tanggal = DateTime::createFromFormat('!Y-m-d', $tanggal);
 
 if (
@@ -54,9 +62,15 @@ $stmt = mysqli_prepare(
     "SELECT nama FROM t_siswa
      WHERE id = ? AND status_aktif = 1"
 );
+
 mysqli_stmt_bind_param($stmt, "i", $siswa_id);
 mysqli_stmt_execute($stmt);
-$data_siswa = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
+
+$data_siswa = mysqli_fetch_assoc(
+    mysqli_stmt_get_result($stmt)
+);
+
+mysqli_stmt_close($stmt);
 
 // Ambil data tahun ajaran
 $stmt = mysqli_prepare(
@@ -64,9 +78,15 @@ $stmt = mysqli_prepare(
     "SELECT nama FROM t_tahun_ajaran
      WHERE id = ? AND status_aktif = 1"
 );
+
 mysqli_stmt_bind_param($stmt, "i", $tahun_id);
 mysqli_stmt_execute($stmt);
-$data_tahun = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
+
+$data_tahun = mysqli_fetch_assoc(
+    mysqli_stmt_get_result($stmt)
+);
+
+mysqli_stmt_close($stmt);
 
 // Ambil data kelas
 $stmt = mysqli_prepare(
@@ -74,48 +94,73 @@ $stmt = mysqli_prepare(
     "SELECT nama FROM t_kelas
      WHERE id = ? AND status_aktif = 1"
 );
+
 mysqli_stmt_bind_param($stmt, "i", $kelas_id);
 mysqli_stmt_execute($stmt);
-$data_kelas = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
 
-// Ambil data pelanggaran dan kategori yang sebenarnya
+$data_kelas = mysqli_fetch_assoc(
+    mysqli_stmt_get_result($stmt)
+);
+
+mysqli_stmt_close($stmt);
+
+// Ambil data pelanggaran
 $stmt = mysqli_prepare(
     $koneksi,
     "SELECT nama, poin, pelanggaran_kategori_id
      FROM t_pelanggaran
      WHERE id = ? AND status_aktif = 1"
 );
+
 mysqli_stmt_bind_param($stmt, "i", $pelanggaran_id);
 mysqli_stmt_execute($stmt);
-$data_pelanggaran = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
 
-// Ambil nama guru
+$data_pelanggaran = mysqli_fetch_assoc(
+    mysqli_stmt_get_result($stmt)
+);
+
+mysqli_stmt_close($stmt);
+
+// Ambil data guru
 $stmt = mysqli_prepare(
     $koneksi,
     "SELECT nama FROM t_guru
      WHERE id = ? AND status_aktif = 1"
 );
+
 mysqli_stmt_bind_param($stmt, "i", $guru_id);
 mysqli_stmt_execute($stmt);
-$data_guru = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
 
+$data_guru = mysqli_fetch_assoc(
+    mysqli_stmt_get_result($stmt)
+);
+
+mysqli_stmt_close($stmt);
+
+// Validasi semua data pilihan
 if (
-    !$data_siswa || !$data_tahun || !$data_kelas ||
-    !$data_pelanggaran || !$data_guru ||
+    !$data_siswa ||
+    !$data_tahun ||
+    !$data_kelas ||
+    !$data_pelanggaran ||
+    !$data_guru ||
     (int) $data_pelanggaran['pelanggaran_kategori_id'] !== $kategori_id ||
     (int) $data_pelanggaran['poin'] !== $poin
 ) {
     $_SESSION['pesan_error'] =
         'Data pilihan tidak ditemukan atau sudah berubah. Silakan pilih ulang.';
+
     header('Location: catat_pelanggaran.php');
     exit;
 }
 
+// Ambil nama dari database
 $nama_siswa = $data_siswa['nama'];
 $nama_kelas = $data_kelas['nama'];
 $nama_pelanggaran = $data_pelanggaran['nama'];
 $nama_guru = $data_guru['nama'];
 
+// Query simpan pelanggaran
 $sql = "INSERT INTO t_pelanggaran_siswa (
             tahun_ajaran_id,
             siswa_id,
@@ -136,9 +181,18 @@ $sql = "INSERT INTO t_pelanggaran_siswa (
 
 $stmt = mysqli_prepare($koneksi, $sql);
 
+if (!$stmt) {
+    $_SESSION['pesan_error'] =
+        'Gagal menyiapkan query: ' . mysqli_error($koneksi);
+
+    header('Location: catat_pelanggaran.php');
+    exit;
+}
+
+// Ikat 15 variabel dengan 15 tipe data
 mysqli_stmt_bind_param(
     $stmt,
-    "iis isisiiisssiss",
+    "iisisisiisssiss",
     $tahun_id,
     $siswa_id,
     $nama_siswa,
@@ -155,3 +209,27 @@ mysqli_stmt_bind_param(
     $tindakan,
     $status
 );
+
+// Eksekusi query
+if (mysqli_stmt_execute($stmt)) {
+
+    $_SESSION['pesan_sukses'] =
+        'Data pelanggaran siswa berhasil disimpan.';
+
+    mysqli_stmt_close($stmt);
+
+    header('Location: catat_pelanggaran.php');
+    exit;
+
+} else {
+
+    $_SESSION['pesan_error'] =
+        'Gagal menyimpan data pelanggaran: ' .
+        mysqli_stmt_error($stmt);
+
+    mysqli_stmt_close($stmt);
+
+    header('Location: catat_pelanggaran.php');
+    exit;
+}
+?>

@@ -4,16 +4,30 @@
 include 'includes/cek_session.php';
 include 'config/koneksi.php';
 
-// Ambil daftar siswa aktif
+// Ambil siswa aktif yang BELUM ditempatkan
+// pada tahun ajaran yang sedang aktif
 $siswa = mysqli_query(
     $koneksi,
-    "SELECT id, nis, nama
-     FROM t_siswa
-     WHERE status_aktif = 1
-     ORDER BY nama ASC"
+    "SELECT s.id, s.nis, s.nama
+     FROM t_siswa s
+     WHERE s.status_aktif = 1
+     AND EXISTS (
+         SELECT 1
+         FROM t_tahun_ajaran ta
+         WHERE ta.status_aktif = 1
+     )
+     AND NOT EXISTS (
+         SELECT 1
+         FROM t_kelas_siswa ks
+         INNER JOIN t_tahun_ajaran ta
+             ON ks.tahun_ajaran_id = ta.id
+         WHERE ks.siswa_id = s.id
+         AND ta.status_aktif = 1
+     )
+     ORDER BY s.nama ASC"
 );
 
-// Ambil daftar tahun ajaran aktif
+// Ambil hanya tahun ajaran yang aktif
 $tahun = mysqli_query(
     $koneksi,
     "SELECT id, nama
@@ -146,14 +160,22 @@ $hasil = mysqli_query($koneksi, $sql);
                                         class="form-select"
                                         required>
 
-                                    <option value="">
-                                        -- Pilih Siswa --
-                                    </option>
+                                    <option value="">-- Pilih Siswa --</option>
 
-                                    <?php while ($s = mysqli_fetch_assoc($siswa)) { ?>
+                                    <?php if (mysqli_num_rows($siswa) > 0) { ?>
 
-                                        <option value="<?= htmlspecialchars($s['id']) ?>">
-                                            <?= htmlspecialchars($s['nis'] . ' - ' . $s['nama']) ?>
+                                        <?php while ($s = mysqli_fetch_assoc($siswa)) { ?>
+
+                                            <option value="<?= htmlspecialchars($s['id']) ?>">
+                                                <?= htmlspecialchars($s['nis'] . ' - ' . $s['nama']) ?>
+                                            </option>
+
+                                        <?php } ?>
+
+                                    <?php } else { ?>
+
+                                        <option value="" disabled>
+                                            Tidak ada siswa yang belum ditempatkan
                                         </option>
 
                                     <?php } ?>
@@ -161,7 +183,6 @@ $hasil = mysqli_query($koneksi, $sql);
                                 </select>
 
                             </div>
-
                             <!-- PILIH TAHUN AJARAN -->
                             <div class="col-md-6 mb-3">
 

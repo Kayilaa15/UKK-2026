@@ -1,6 +1,5 @@
 <?php
 // kelola_tahun_ajaran.php
-
 include 'includes/cek_session.php';
 include 'config/koneksi.php';
 
@@ -10,216 +9,181 @@ $hasil = mysqli_query($koneksi, $sql);
 
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Kelola Tahun Ajaran</title>
 
-    <!-- Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-        rel="stylesheet">
-
-    <!-- DataTables Bootstrap 5 -->
-    <link href="https://cdn.datatables.net/2.3.4/css/dataTables.bootstrap5.min.css"
-        rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/2.3.4/css/dataTables.bootstrap5.min.css" rel="stylesheet">
 </head>
 
 <body>
 
-    <div class="container-fluid">
-        <div class="row">
+<div class="container-fluid">
+    <div class="row">
 
-            <?php include 'layout/sidebar.php'; ?>
+        <?php include 'layout/sidebar.php'; ?>
 
-            <!-- KONTEN -->
-            <main class="col-md-9 col-lg-10 p-4">
+        <main class="col-md-9 col-lg-10 p-4">
 
-                <h1 class="mb-4">Kelola Tahun Ajaran</h1>
+            <h2 class="mb-4">Kelola Tahun Ajaran</h2>
+          <?php
+            if (isset($_SESSION['pesan_sukses'])) {
+                echo '<div class="alert alert-success alert-dismissible fade show" role="alert">';
+                echo $_SESSION['pesan_sukses'];
+                echo '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+                echo '</div>';
 
-                <!-- Tombol Navigasi -->
-                <div class="mb-3">
+                unset($_SESSION['pesan_sukses']);
+            }
 
-                    <a href="dashboard.php" class="btn btn-secondary">
-                        Kembali ke Dashboard
-                    </a>
+            if (isset($_SESSION['pesan_error'])) {
+                echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">';
+                echo $_SESSION['pesan_error'];
+                echo '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+                echo '</div>';
 
-                    <a href="tambah_tahun_ajaran.php" class="btn btn-primary">
-                        + Tambah Tahun Ajaran
-                    </a>
+                unset($_SESSION['pesan_error']);
+            }
+            ?>
+            <div class="mb-3">
+                <a href="dashboard.php" class="btn btn-secondary">
+                    Kembali ke Dashboard
+                </a>
 
+                <a href="tambah_tahun_ajaran.php" class="btn btn-primary">
+                    + Tambah Tahun Ajaran
+                </a>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">Daftar Tahun Ajaran</h5>
                 </div>
+                <div class="card-body">
 
-                <!-- TABEL DATA TAHUN AJARAN -->
-                <div class="card shadow-sm">
-                    <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="tabelTahunAjaran" class="table table-striped table-bordered table-hover">
 
-                        <div class="table-responsive">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>No</th>
+                                    <th>Tahun Ajaran</th>
+                                    <th>Tanggal Mulai</th>
+                                    <th>Tanggal Selesai</th>
+                                    <th>Status Aktif</th>
+                                    <th>Dibuat</th>
+                                    <th>Diubah</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
 
-                            <table id="tabelTahunAjaran"
-                                class="table table-striped table-bordered table-hover align-middle w-100">
-
-                                <thead class="table-dark">
+                            <tbody>
+                                <?php while ($row = mysqli_fetch_assoc($hasil)) { ?>
                                     <tr>
-                                        <th>No</th>
-                                        <th>Nama Tahun Ajaran</th>
-                                        <th>Tanggal Mulai</th>
-                                        <th>Tanggal Selesai</th>
-                                        <th>Status Aktif</th>
-                                        <th>Dibuat</th>
-                                        <th>Diubah</th>
-                                        <th>Aksi</th>
+                                        <!-- Nomor otomatis diatur oleh DataTables -->
+                                        <td></td>
+
+                                        <td><?= htmlspecialchars($row['nama']) ?></td>
+
+                                        <td><?= htmlspecialchars($row['tanggal_mulai'] ?? '') ?></td>
+
+                                        <td><?= htmlspecialchars($row['tanggal_selesai'] ?? '') ?></td>
+
+                                        <td>
+                                            <?php if ($row['status_aktif'] == 1) { ?>
+                                                <span class="badge bg-success">Aktif</span>
+                                            <?php } else { ?>
+                                                <span class="badge bg-danger">Tidak Aktif</span>
+                                            <?php } ?>
+                                        </td>
+
+                                        <td><?= htmlspecialchars($row['created_at'] ?? '') ?></td>
+
+                                        <td><?= htmlspecialchars($row['updated_at'] ?? '') ?></td>
+
+                                        <td>
+                                            <a href="edit_tahun_ajaran.php?id=<?= urlencode($row['id']) ?>"
+                                               class="btn btn-warning btn-sm">
+                                                Edit
+                                            </a>
+
+                                            <a href="hapus_tahun_ajaran.php?id=<?= urlencode($row['id']) ?>"
+                                               class="btn btn-danger btn-sm"
+                                               onclick="return confirm('Yakin ingin menghapus data tahun ajaran ini?');">
+                                                Hapus
+                                            </a>
+                                        </td>
                                     </tr>
-                                </thead>
+                                <?php } ?>
+                            </tbody>
 
-                                <tbody>
-
-                                    <?php while ($row = mysqli_fetch_assoc($hasil)) { ?>
-
-                                        <tr>
-                                            <!-- Nomor urut otomatis -->
-                                            <td></td>
-
-                                            <td>
-                                                <?= htmlspecialchars($row['nama'] ?? '') ?>
-                                            </td>
-
-                                            <td>
-                                                <?= htmlspecialchars($row['tanggal_mulai'] ?? '-') ?>
-                                            </td>
-
-                                            <td>
-                                                <?= htmlspecialchars($row['tanggal_selesai'] ?? '-') ?>
-                                            </td>
-
-                                            <td>
-                                                <?php if ($row['status_aktif'] == 1) { ?>
-
-                                                    <span class="badge bg-success">
-                                                        Aktif
-                                                    </span>
-
-                                                <?php } else { ?>
-
-                                                    <span class="badge bg-danger">
-                                                        Tidak Aktif
-                                                    </span>
-
-                                                <?php } ?>
-                                            </td>
-
-                                            <td>
-                                                <?= htmlspecialchars($row['created_at'] ?? '-') ?>
-                                            </td>
-
-                                            <td>
-                                                <?= htmlspecialchars($row['updated_at'] ?? '-') ?>
-                                            </td>
-
-                                            <td>
-                                                <div class="d-flex gap-2">
-
-                                                    <a href="edit_tahun_ajaran.php?id=<?= urlencode($row['id']) ?>"
-                                                        class="btn btn-warning btn-sm">
-                                                        Edit
-                                                    </a>
-
-                                                    <a href="hapus_tahun_ajaran.php?id=<?= urlencode($row['id']) ?>"
-                                                        class="btn btn-danger btn-sm"
-                                                        onclick="return confirm('Yakin ingin menghapus tahun ajaran ini?');">
-                                                        Hapus
-                                                    </a>
-
-                                                </div>
-                                            </td>
-
-                                        </tr>
-
-                                    <?php } ?>
-
-                                </tbody>
-
-                            </table>
-
-                        </div>
-
+                        </table>
                     </div>
+
                 </div>
+            </div>
 
-            </main>
-
-        </div>
+        </main>
     </div>
+</div>
 
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/2.3.4/js/dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/2.3.4/js/dataTables.bootstrap5.min.js"></script>
 
-    <!-- DataTables -->
-    <script src="https://cdn.datatables.net/2.3.4/js/dataTables.min.js"></script>
+<script>
+$(document).ready(function () {
 
-    <!-- DataTables Bootstrap 5 -->
-    <script src="https://cdn.datatables.net/2.3.4/js/dataTables.bootstrap5.min.js"></script>
+    $('#tabelTahunAjaran').DataTable({
 
-    <!-- Inisialisasi DataTables -->
-    <script>
-        $(document).ready(function () {
+        language: {
+            search: "Cari:",
+            lengthMenu: "Tampilkan _MENU_ data",
+            info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+            infoEmpty: "Tidak ada data tahun ajaran",
+            infoFiltered: "(difilter dari _MAX_ total data)",
+            zeroRecords: "Data tahun ajaran tidak ditemukan",
+            emptyTable: "Belum ada data tahun ajaran",
 
-            $('#tabelTahunAjaran').DataTable({
+            paginate: {
+                first: "Pertama",
+                last: "Terakhir",
+                next: "Berikutnya",
+                previous: "Sebelumnya"
+            }
+        },
 
-                language: {
-                    search: "Cari:",
-                    lengthMenu: "Tampilkan _MENU_ data",
-                    info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
-                    infoEmpty: "Tidak ada data tahun ajaran",
-                    infoFiltered: "(difilter dari _MAX_ total data)",
-                    zeroRecords: "Data tahun ajaran tidak ditemukan",
-                    emptyTable: "Belum ada data tahun ajaran",
+        pageLength: 10,
 
-                    paginate: {
-                        first: "Pertama",
-                        last: "Terakhir",
-                        next: "Berikutnya",
-                        previous: "Sebelumnya"
-                    }
-                },
+        // Urutkan berdasarkan tanggal mulai
+        order: [[3, 'desc']],
 
-                pageLength: 10,
+        // Kolom No tidak bisa diurutkan atau dicari
+        columnDefs: [
+            {
+                targets: 0,
+                orderable: false,
+                searchable: false
+            }
+        ],
 
-                lengthMenu: [5, 10, 25, 50, 100],
+        // Nomor otomatis mengikuti urutan data yang tampil
+        drawCallback: function () {
+            var api = this.api();
+            var info = api.page.info();
 
-                // Urutkan berdasarkan tanggal mulai terbaru
-                order: [[2, 'desc']],
-
-                columnDefs: [
-                    {
-                        targets: [0, 7],
-                        orderable: false,
-                        searchable: false
-                    }
-                ],
-
-                // Nomor urut otomatis
-                drawCallback: function () {
-
-                    var api = this.api();
-                    var info = api.page.info();
-
-                    api.column(0, {
-                        page: 'current'
-                    }).nodes().each(function (cell, i) {
-
-                        cell.innerHTML = info.start + i + 1;
-
-                    });
-
-                }
-
+            api.column(0, { page: 'current' }).nodes().each(function (cell, i) {
+                cell.innerHTML = info.start + i + 1;
             });
+        }
 
-        });
-    </script>
+    });
+
+});
+</script>
 
 </body>
-
 </html>

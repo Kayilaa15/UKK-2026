@@ -3,40 +3,31 @@
 include 'includes/cek_session.php';
 include 'config/koneksi.php';
 
-$tahun_ajaran_id = $_POST['tahun_ajaran_id'];
-$kelas_id = $_POST['kelas_id'];
+// Ambil data dari form
 $guru_id = $_POST['guru_id'];
-$tanggal_mulai = $_POST['tanggal_mulai'];
-$tanggal_selesai = $_POST['tanggal_selesai'];
-$status_aktif = $_POST['status_aktif'];
+$kelas_id = $_POST['kelas_id'];
+$tahun_ajaran_id = $_POST['tahun_ajaran_id'];
 
-if ($tanggal_selesai < $tanggal_mulai) {
-    exit('Tanggal selesai tidak boleh lebih awal dari tanggal mulai.');
+// Cek data kosong
+if ($guru_id == '' || $kelas_id == '' || $tahun_ajaran_id == '') {
+    $_SESSION['pesan_error'] = "Semua data harus diisi!";
+    header("Location: tambah_wali_kelas.php");
+    exit;
 }
 
+// Simpan data wali kelas
 $sql = "INSERT INTO t_wali_kelas
-        (tahun_ajaran_id, kelas_id, guru_id,
-         tanggal_mulai, tanggal_selesai, status_aktif)
-        VALUES (?, ?, ?, ?, ?, ?)";
+        (guru_id, kelas_id, tahun_ajaran_id, created_at, updated_at)
+        VALUES
+        ('$guru_id', '$kelas_id', '$tahun_ajaran_id', NOW(), NOW())";
 
-$stmt = mysqli_prepare($koneksi, $sql);
-
-mysqli_stmt_bind_param(
-    $stmt,
-    "iiissi",
-    $tahun_ajaran_id,
-    $kelas_id,
-    $guru_id,
-    $tanggal_mulai,
-    $tanggal_selesai,
-    $status_aktif
-);
-
-if (mysqli_stmt_execute($stmt)) {
+if (mysqli_query($koneksi, $sql)) {
+    $_SESSION['pesan_sukses'] = "Wali kelas berhasil ditambahkan!";
     header("Location: kelola_wali_kelas.php");
     exit;
 } else {
-    echo "Gagal menambahkan wali kelas: "
-        . mysqli_stmt_error($stmt);
+    $_SESSION['pesan_error'] = "Wali kelas gagal ditambahkan!";
+    header("Location: tambah_wali_kelas.php");
+    exit;
 }
 ?>
