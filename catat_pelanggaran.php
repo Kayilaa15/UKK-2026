@@ -275,25 +275,71 @@ $hasil = mysqli_query($koneksi, $sql);
                                     <th>Poin</th>
                                     <th>Tindakan</th>
                                     <th>Status</th>
+                                    <th>Aksi</th>
                                 </tr>
                             </thead>
 
                             <tbody>
-                            <?php $no = 1; ?>
-                            <?php while ($row = mysqli_fetch_assoc($hasil)) { ?>
-                                <tr>
-                                    <td><?php echo $no++; ?></td>
-                                    <td><?php echo htmlspecialchars($row['nama_siswa']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['nama_kelas']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['tahun_ajaran']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['nama_pelanggaran']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['nama_guru']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['tanggal']); ?></td>
-                                    <td><?php echo (int) $row['poin']; ?></td>
-                                    <td><?php echo htmlspecialchars($row['tindakan']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['status']); ?></td>
-                                </tr>
-                            <?php } ?>
+                                <?php $no = 1; ?>
+
+                                <?php while ($row = mysqli_fetch_assoc($hasil)) { ?>
+                                    <tr>
+                                        <td><?= $no++; ?></td>
+
+                                        <td>
+                                            <?= htmlspecialchars($row['nama_siswa'] ?? '-'); ?>
+                                        </td>
+
+                                        <td>
+                                            <?= htmlspecialchars($row['nama_kelas'] ?? '-'); ?>
+                                        </td>
+
+                                        <td>
+                                            <?= htmlspecialchars($row['tahun_ajaran'] ?? '-'); ?>
+                                        </td>
+
+                                        <td>
+                                            <?= htmlspecialchars($row['nama_pelanggaran'] ?? '-'); ?>
+                                        </td>
+
+                                        <td>
+                                            <?= htmlspecialchars($row['nama_guru'] ?? '-'); ?>
+                                        </td>
+
+                                        <td>
+                                            <?= htmlspecialchars($row['tanggal'] ?? '-'); ?>
+                                        </td>
+
+                                        <td>
+                                            <?= (int) $row['poin']; ?>
+                                        </td>
+
+                                        <td>
+                                            <?= htmlspecialchars($row['tindakan'] ?? '-'); ?>
+                                        </td>
+
+                                        <td>
+                                            <?= htmlspecialchars($row['status'] ?? '-'); ?>
+                                        </td>
+
+                                        <td>
+                                            <div class="d-flex gap-2">
+
+                                                <a href="edit_catat_pelanggaran.php?id=<?= (int) $row['id']; ?>"
+                                                class="btn btn-warning btn-sm">
+                                                    Edit
+                                                </a>
+
+                                                <a href="hapus_catat_pelanggaran.php?id=<?= (int) $row['id']; ?>"
+                                                class="btn btn-danger btn-sm"
+                                                onclick="return confirm('Yakin ingin menghapus catatan pelanggaran ini?');">
+                                                    Hapus
+                                                </a>
+
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <?php } ?>
                             </tbody>
                         </table>
                     </div>

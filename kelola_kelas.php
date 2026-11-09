@@ -83,7 +83,6 @@ $hasil = mysqli_query($koneksi, $sql);
                             <thead class="table-dark">
                                 <tr>
                                     <th>No</th>
-                                    <th>ID</th>
                                     <th>Nama Kelas</th>
                                     <th>Tingkat</th>
                                     <th>Jurusan</th>
@@ -103,8 +102,6 @@ $hasil = mysqli_query($koneksi, $sql);
                                 ?>
                                     <tr>
                                         <td><?= $no++; ?></td>
-
-                                        <td><?= (int) $row['id']; ?></td>
 
                                         <td>
                                             <?= htmlspecialchars($row['nama'] ?? ''); ?>
@@ -204,12 +201,12 @@ $(document).ready(function () {
 
         // Kolom aksi tidak bisa diurutkan atau dicari
         columnDefs: [
-            {
-                targets: 8,
-                orderable: false,
-                searchable: false
-            }
-        ]
+    {
+        targets: 7,
+        orderable: false,
+        searchable: false
+    }
+]
     });
 });
 </script>
