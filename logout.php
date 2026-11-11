@@ -1,4 +1,3 @@
-
 <?php
 // logout.php
 session_start();
@@ -6,12 +5,12 @@ session_start();
 include 'config/koneksi.php';
 
 // Catat aktivitas logout sebelum session dihapus
-if (isset($_SESSION['id_user'])) {
-    $id_user = (int) $_SESSION['id_user'];
+if (isset($_SESSION['id_users'])) {
+    $id_user = (int) $_SESSION['id_users'];
     $waktu = date('Y-m-d H:i:s');
     $aktivitas = 'logout';
 
-    $sql = "INSERT INTO tbl_log (id_user, aktivitas, waktu)
+    $sql = "INSERT INTO tbl_log (id_users, aktivitas, waktu)
             VALUES (?, ?, ?)";
 
     $stmt = mysqli_prepare($koneksi, $sql);

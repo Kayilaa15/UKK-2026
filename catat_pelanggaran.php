@@ -17,6 +17,7 @@ $siswa = mysqli_query(
 
 // ==========================================
 // TAHUN AJARAN AKTIF
+// TETAP MENGGUNAKAN KODE LAMA
 // ==========================================
 $tahun = mysqli_query(
     $koneksi,
@@ -29,15 +30,52 @@ $tahun = mysqli_query(
 $tahun_aktif = mysqli_fetch_assoc($tahun);
 
 // ==========================================
-// DAFTAR KELAS AKTIF
+// DAFTAR PENEMPATAN KELAS SISWA
+// SESUAI TAHUN AJARAN AKTIF
 // ==========================================
-$kelas = mysqli_query(
-    $koneksi,
-    "SELECT id, nama, tingkat, jurusan
-     FROM t_kelas
-     WHERE status_aktif = 1
-     ORDER BY nama ASC"
-);
+$daftar_penempatan = [];
+
+if ($tahun_aktif) {
+
+    $stmt_penempatan = mysqli_prepare(
+        $koneksi,
+        "SELECT
+            ks.siswa_id,
+            ks.kelas_id,
+            k.nama AS nama_kelas,
+            k.tingkat,
+            k.jurusan
+         FROM t_kelas_siswa ks
+         INNER JOIN t_kelas k
+            ON ks.kelas_id = k.id
+         WHERE ks.tahun_ajaran_id = ?
+         AND ks.status_aktif = 1
+         AND k.status_aktif = 1"
+    );
+
+    mysqli_stmt_bind_param(
+        $stmt_penempatan,
+        "i",
+        $tahun_aktif['id']
+    );
+
+    mysqli_stmt_execute($stmt_penempatan);
+
+    $result_penempatan = mysqli_stmt_get_result(
+        $stmt_penempatan
+    );
+
+    while ($data = mysqli_fetch_assoc($result_penempatan)) {
+
+        $daftar_penempatan[$data['siswa_id']] = [
+            'kelas_id' => $data['kelas_id'],
+            'nama_kelas' => $data['nama_kelas'],
+            'tingkat' => $data['tingkat'],
+            'jurusan' => $data['jurusan']
+        ];
+
+    }
+}
 
 // ==========================================
 // DAFTAR JENIS PELANGGARAN
@@ -64,10 +102,16 @@ $stmt_guru = mysqli_prepare(
      LIMIT 1"
 );
 
-mysqli_stmt_bind_param($stmt_guru, "i", $id_user);
+mysqli_stmt_bind_param(
+    $stmt_guru,
+    "i",
+    $id_user
+);
+
 mysqli_stmt_execute($stmt_guru);
 
 $result_guru = mysqli_stmt_get_result($stmt_guru);
+
 $data_guru = mysqli_fetch_assoc($result_guru);
 
 $guru_id_login = $data_guru['id'] ?? 0;
@@ -109,7 +153,9 @@ $hasil = mysqli_query($koneksi, $sql);
 <html lang="id">
 
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <title>Catat Pelanggaran Siswa</title>
@@ -117,7 +163,7 @@ $hasil = mysqli_query($koneksi, $sql);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
           rel="stylesheet">
 
-    <!-- Tom Select untuk pencarian dropdown -->
+    <!-- TOM SELECT -->
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/css/tom-select.bootstrap5.min.css"
           rel="stylesheet">
 
@@ -126,6 +172,7 @@ $hasil = mysqli_query($koneksi, $sql);
 <body>
 
 <div class="container-fluid">
+
     <div class="row">
 
         <?php include 'layout/sidebar.php'; ?>
@@ -134,32 +181,46 @@ $hasil = mysqli_query($koneksi, $sql);
 
             <h2 class="mb-4">Catat Pelanggaran Siswa</h2>
 
+            <!-- PESAN SUKSES -->
             <?php if (isset($_SESSION['pesan_sukses'])) { ?>
+
                 <div class="alert alert-success">
                     <?= htmlspecialchars($_SESSION['pesan_sukses']); ?>
                 </div>
+
                 <?php unset($_SESSION['pesan_sukses']); ?>
+
             <?php } ?>
 
+            <!-- PESAN ERROR -->
             <?php if (isset($_SESSION['pesan_error'])) { ?>
+
                 <div class="alert alert-danger">
                     <?= htmlspecialchars($_SESSION['pesan_error']); ?>
                 </div>
+
                 <?php unset($_SESSION['pesan_error']); ?>
+
             <?php } ?>
 
+            <!-- CEK TAHUN AJARAN -->
             <?php if (!$tahun_aktif) { ?>
+
                 <div class="alert alert-warning">
                     Belum ada tahun ajaran yang aktif.
                     Silakan aktifkan tahun ajaran terlebih dahulu.
                 </div>
+
             <?php } ?>
 
+            <!-- CEK GURU -->
             <?php if (!$data_guru) { ?>
+
                 <div class="alert alert-danger">
                     Akun yang sedang login belum terhubung dengan
                     data guru atau status guru tidak aktif.
                 </div>
+
             <?php } ?>
 
             <!-- FORM CATAT PELANGGARAN -->
@@ -172,28 +233,35 @@ $hasil = mysqli_query($koneksi, $sql);
                 <div class="card-body">
 
                     <form action="proses_simpan_pelanggaran.php"
-                          method="POST">
+                          method="POST"
+                          id="formPelanggaran">
 
                         <div class="row">
 
                             <!-- SISWA -->
                             <div class="col-md-6 mb-3">
 
-                                <label class="form-label">Siswa</label>
+                                <label class="form-label">
+                                    Siswa
+                                </label>
 
                                 <select name="siswa_id"
                                         id="siswa"
                                         class="form-select"
                                         required>
 
-                                    <option value="">-- Pilih Siswa --</option>
+                                    <option value="">
+                                        -- Pilih Siswa --
+                                    </option>
 
                                     <?php while ($s = mysqli_fetch_assoc($siswa)) { ?>
 
                                         <option value="<?= $s['id']; ?>">
+
                                             <?= htmlspecialchars(
                                                 $s['nis'] . ' - ' . $s['nama']
                                             ); ?>
+
                                         </option>
 
                                     <?php } ?>
@@ -203,9 +271,12 @@ $hasil = mysqli_query($koneksi, $sql);
                             </div>
 
                             <!-- TAHUN AJARAN OTOMATIS -->
+                            <!-- TIDAK DIUBAH -->
                             <div class="col-md-6 mb-3">
 
-                                <label class="form-label">Tahun Ajaran</label>
+                                <label class="form-label">
+                                    Tahun Ajaran
+                                </label>
 
                                 <?php if ($tahun_aktif) { ?>
 
@@ -229,35 +300,32 @@ $hasil = mysqli_query($koneksi, $sql);
 
                             </div>
 
-                            <!-- KELAS -->
+                            <!-- KELAS OTOMATIS -->
                             <div class="col-md-6 mb-3">
 
-                                <label class="form-label">Kelas</label>
+                                <label class="form-label">
+                                    Kelas
+                                </label>
 
-                                <select name="kelas_id"
-                                        id="kelas"
-                                        class="form-select"
-                                        required>
+                                <input type="text"
+                                       id="nama_kelas"
+                                       class="form-control"
+                                       placeholder="Kelas akan terisi otomatis"
+                                       readonly
+                                       required>
 
-                                    <option value="">-- Pilih Kelas --</option>
+                                <input type="hidden"
+                                       name="kelas_id"
+                                       id="kelas_id">
 
-                                    <?php while ($k = mysqli_fetch_assoc($kelas)) { ?>
-
-                                        <option value="<?= $k['id']; ?>">
-                                            <?= htmlspecialchars(
-                                                $k['nama'] . ' - ' .
-                                                $k['tingkat'] . ' - ' .
-                                                $k['jurusan']
-                                            ); ?>
-                                        </option>
-
-                                    <?php } ?>
-
-                                </select>
+                                <small class="text-muted">
+                                    Kelas otomatis mengikuti penempatan
+                                    siswa pada tahun ajaran aktif.
+                                </small>
 
                             </div>
 
-                            <!-- JENIS PELANGGARAN SEARCH -->
+                            <!-- JENIS PELANGGARAN -->
                             <div class="col-md-6 mb-3">
 
                                 <label class="form-label">
@@ -269,7 +337,9 @@ $hasil = mysqli_query($koneksi, $sql);
                                         class="form-select"
                                         required>
 
-                                    <option value="">-- Cari Jenis Pelanggaran --</option>
+                                    <option value="">
+                                        -- Cari Jenis Pelanggaran --
+                                    </option>
 
                                     <?php while ($p = mysqli_fetch_assoc($pelanggaran)) { ?>
 
@@ -296,26 +366,14 @@ $hasil = mysqli_query($koneksi, $sql);
 
                             </div>
 
-                            <!-- GURU OTOMATIS -->
-                            <div class="col-md-6 mb-3">
-
-                                <label class="form-label">Guru Pelapor</label>
-
-                                <input type="text"
-                                       class="form-control"
-                                       value="<?= htmlspecialchars($data_guru['nama'] ?? 'Guru tidak ditemukan'); ?>"
-                                       readonly>
-
-                                <input type="hidden"
-                                       name="guru_id"
-                                       value="<?= (int) $guru_id_login; ?>">
-
-                            </div>
+                           
 
                             <!-- TANGGAL -->
                             <div class="col-md-6 mb-3">
 
-                                <label class="form-label">Tanggal</label>
+                                <label class="form-label">
+                                    Tanggal
+                                </label>
 
                                 <input type="date"
                                        name="tanggal"
@@ -328,7 +386,9 @@ $hasil = mysqli_query($koneksi, $sql);
                             <!-- STATUS -->
                             <div class="col-md-6 mb-3">
 
-                                <label class="form-label">Status</label>
+                                <label class="form-label">
+                                    Status
+                                </label>
 
                                 <select name="status"
                                         class="form-select"
@@ -353,7 +413,9 @@ $hasil = mysqli_query($koneksi, $sql);
                             <!-- KETERANGAN -->
                             <div class="col-md-12 mb-3">
 
-                                <label class="form-label">Keterangan</label>
+                                <label class="form-label">
+                                    Keterangan
+                                </label>
 
                                 <textarea name="keterangan"
                                           class="form-control"
@@ -363,6 +425,7 @@ $hasil = mysqli_query($koneksi, $sql);
 
                         </div>
 
+                        <!-- TOMBOL -->
                         <button type="submit"
                                 class="btn btn-primary"
                                 <?= (!$tahun_aktif || !$data_guru) ? 'disabled' : ''; ?>>
@@ -381,8 +444,8 @@ $hasil = mysqli_query($koneksi, $sql);
                     </form>
 
                 </div>
-            </div>
 
+            </div>
 
             <!-- TABEL DATA PELANGGARAN -->
             <div class="card">
@@ -400,6 +463,7 @@ $hasil = mysqli_query($koneksi, $sql);
                             <thead class="table-dark">
 
                                 <tr>
+
                                     <th>No</th>
                                     <th>Nama Siswa</th>
                                     <th>Kelas</th>
@@ -409,6 +473,7 @@ $hasil = mysqli_query($koneksi, $sql);
                                     <th>Tanggal</th>
                                     <th>Status</th>
                                     <th>Aksi</th>
+
                                 </tr>
 
                             </thead>
@@ -421,7 +486,9 @@ $hasil = mysqli_query($koneksi, $sql);
 
                                     <tr>
 
-                                        <td><?= $no++; ?></td>
+                                        <td>
+                                            <?= $no++; ?>
+                                        </td>
 
                                         <td>
                                             <?= htmlspecialchars($row['nama_siswa'] ?? '-'); ?>
@@ -521,6 +588,7 @@ $hasil = mysqli_query($koneksi, $sql);
         </main>
 
     </div>
+
 </div>
 
 
@@ -529,22 +597,67 @@ $hasil = mysqli_query($koneksi, $sql);
 
 <script>
 
-// Pencarian siswa
-new TomSelect("#siswa", {
+// ==========================================
+// DATA PENEMPATAN SISWA DARI PHP
+// ==========================================
+const dataPenempatan = <?= json_encode(
+    $daftar_penempatan,
+    JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP
+); ?>;
+
+
+// ==========================================
+// PENCARIAN SISWA DAN KELAS OTOMATIS
+// ==========================================
+const pilihanSiswa = new TomSelect("#siswa", {
+
     create: false,
-    placeholder: "Cari nama atau NIS siswa..."
+
+    placeholder: "Cari nama atau NIS siswa...",
+
+    onChange: function(value) {
+
+        const kelas = dataPenempatan[value];
+
+        const inputNamaKelas =
+            document.getElementById('nama_kelas');
+
+        const inputKelasId =
+            document.getElementById('kelas_id');
+
+        if (kelas) {
+
+            inputNamaKelas.value =
+                kelas.nama_kelas + ' - ' +
+                kelas.tingkat + ' - ' +
+                kelas.jurusan;
+
+            inputKelasId.value = kelas.kelas_id;
+
+        } else {
+
+            inputNamaKelas.value =
+                'Siswa belum memiliki penempatan kelas aktif';
+
+            inputKelasId.value = '';
+
+        }
+
+    }
+
 });
 
-// Pencarian kelas
-new TomSelect("#kelas", {
-    create: false,
-    placeholder: "Cari kelas..."
-});
 
-// Pencarian jenis pelanggaran
+// ==========================================
+// PENCARIAN JENIS PELANGGARAN
+// DAN POIN OTOMATIS
+// ==========================================
 const pilihanPelanggaran = new TomSelect("#pelanggaran", {
+
     create: false,
+
     placeholder: "Cari jenis pelanggaran...",
+
     onChange: function(value) {
 
         const opsi = document.querySelector(
@@ -554,7 +667,35 @@ const pilihanPelanggaran = new TomSelect("#pelanggaran", {
         document.getElementById('kategori').value =
             opsi ? opsi.dataset.kategori : '';
 
+        document.getElementById('poin').value =
+            opsi ? opsi.dataset.poin : '';
+
     }
+
+});
+
+
+// ==========================================
+// VALIDASI SEBELUM SIMPAN
+// ==========================================
+document.getElementById('formPelanggaran')
+.addEventListener('submit', function(e) {
+
+    const kelasId =
+        document.getElementById('kelas_id').value;
+
+    if (!kelasId) {
+
+        e.preventDefault();
+
+        alert(
+            'Siswa belum memiliki penempatan kelas aktif pada tahun ajaran ini!'
+        );
+
+        return false;
+
+    }
+
 });
 
 </script>

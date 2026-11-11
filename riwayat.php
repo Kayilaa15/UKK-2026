@@ -1,3 +1,4 @@
+
 <?php
 // riwayat.php
 
@@ -17,28 +18,32 @@ $status = isset($_GET['status'])
     ? mysqli_real_escape_string($koneksi, trim($_GET['status']))
     : '';
 
-// Query dasar
-$sql = "SELECT *
-        FROM t_pelanggaran_siswa
-        WHERE 1=1";
+// Ambil ID user yang sedang login
+$id_user = (int) ($_SESSION['id'] ?? 0);
 
-// Pencarian berdasarkan nama siswa, pelanggaran, kelas, atau guru
+// Query dasar: hanya riwayat guru yang memiliki akun login tersebut
+$sql = "SELECT p.*
+        FROM t_pelanggaran_siswa p
+        INNER JOIN t_guru g ON p.guru_id = g.id
+        WHERE g.user_id = $id_user";
+
+// Pencarian
 if ($cari != '') {
     $sql .= " AND (
-        nama_siswa LIKE '%$cari%'
-        OR nama_pelanggaran LIKE '%$cari%'
-        OR nama_kelas LIKE '%$cari%'
-        OR nama_guru LIKE '%$cari%'
+        p.nama_siswa LIKE '%$cari%'
+        OR p.nama_pelanggaran LIKE '%$cari%'
+        OR p.nama_kelas LIKE '%$cari%'
+        OR p.nama_guru LIKE '%$cari%'
     )";
 }
 
-// Filter berdasarkan status
+// Filter status
 if ($status != '') {
-    $sql .= " AND status = '$status'";
+    $sql .= " AND p.status = '$status'";
 }
 
 // Urutkan berdasarkan tanggal terbaru
-$sql .= " ORDER BY tanggal DESC, id DESC";
+$sql .= " ORDER BY p.tanggal DESC, p.id DESC";
 
 // Menjalankan query
 $query = mysqli_query($koneksi, $sql);
@@ -47,9 +52,10 @@ if (!$query) {
     die('Gagal mengambil data: ' . mysqli_error($koneksi));
 }
 
-// Menghitung jumlah data sesuai filter
+// Menghitung jumlah data
 $jumlah = mysqli_num_rows($query);
 ?>
+
 
 <!DOCTYPE html>
 <html lang="id">
