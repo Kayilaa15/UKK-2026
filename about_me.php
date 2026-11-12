@@ -99,7 +99,7 @@ include 'includes/cek_session.php';
 
                                     <tr>
                                         <th>Kelas</th>
-                                        <td>XI RPL 1</td>
+                                        <td>XII RPL 1</td>
                                     </tr>
 
                                     <tr>

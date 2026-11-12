@@ -56,7 +56,7 @@ $sql = "SELECT
             k.jurusan,
             ks.tanggal_mulai,
             ks.tanggal_selesai,
-            ks.status_aktif
+            s.status_aktif
         FROM t_kelas_siswa ks
         LEFT JOIN t_siswa s ON ks.siswa_id = s.id
         LEFT JOIN t_tahun_ajaran ta ON ks.tahun_ajaran_id = ta.id

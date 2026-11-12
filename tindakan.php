@@ -1,3 +1,4 @@
+
 <?php
 // tindakan.php
 
@@ -14,60 +15,36 @@ function tentukanTindakan($namaPelanggaran)
 
     if (strpos($nama, 'rambut') !== false) {
         return 'Menegur siswa dan meminta siswa merapikan rambut sesuai aturan sekolah.';
-    }
-
-    elseif (
+    } elseif (
         strpos($nama, 'rokok') !== false ||
         strpos($nama, 'vape') !== false
     ) {
         return 'Memberikan pembinaan dan memanggil orang tua siswa.';
-    }
-
-    elseif (
+    } elseif (
         strpos($nama, 'tidak masuk') !== false ||
         strpos($nama, 'absen') !== false
     ) {
         return 'Memberikan teguran dan meminta surat keterangan dari orang tua.';
-    }
-
-    elseif (
-        strpos($nama, 'sampah') !== false ||
-        strpos($nama, 'membuang sampah') !== false
-    ) {
+    } elseif (strpos($nama, 'sampah') !== false) {
         return 'Memberikan teguran dan meminta siswa membersihkan lingkungan sekolah.';
-    }
-
-    elseif (
+    } elseif (
         strpos($nama, 'gaduh') !== false ||
         strpos($nama, 'ribut') !== false
     ) {
         return 'Memberikan teguran dan pembinaan agar siswa tidak mengulangi perbuatannya.';
-    }
-
-    elseif (
-        strpos($nama, 'terlambat') !== false
-    ) {
+    } elseif (strpos($nama, 'terlambat') !== false) {
         return 'Memberikan teguran dan pembinaan kedisiplinan kepada siswa.';
-    }
-
-    elseif (
-        strpos($nama, 'meninggalkan kelas') !== false
-    ) {
+    } elseif (strpos($nama, 'meninggalkan kelas') !== false) {
         return 'Memberikan teguran dan meminta siswa mengikuti kegiatan belajar dengan tertib.';
-    }
-
-    elseif (
+    } elseif (
         strpos($nama, 'tidak mengerjakan tugas') !== false ||
         strpos($nama, 'tugas') !== false
     ) {
         return 'Meminta siswa menyelesaikan tugas dan memberikan pembinaan.';
-    }
-
-    else {
+    } else {
         return 'Memberikan teguran dan pembinaan kepada siswa agar tidak mengulangi pelanggaran.';
     }
 }
-
 
 // ====================================
 // SIMPAN TINDAKAN
@@ -81,7 +58,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($id <= 0 || $tindakan === '') {
 
         $_SESSION['pesan_error'] = 'Data tindakan tidak boleh kosong.';
-
         header('Location: tindakan.php');
         exit;
     }
@@ -94,12 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
          AND (tindakan IS NULL OR TRIM(tindakan) = '')"
     );
 
-    mysqli_stmt_bind_param(
-        $stmt,
-        "si",
-        $tindakan,
-        $id
-    );
+    mysqli_stmt_bind_param($stmt, "si", $tindakan, $id);
 
     if (mysqli_stmt_execute($stmt)) {
 
@@ -110,9 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
     } else {
-
         $_SESSION['pesan_error'] = 'Gagal menyimpan tindakan: ' . mysqli_stmt_error($stmt);
-
     }
 
     mysqli_stmt_close($stmt);
@@ -120,7 +89,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header('Location: tindakan.php');
     exit;
 }
-
 
 // ====================================
 // AMBIL DATA PELANGGARAN BELUM DITINDAK
@@ -155,13 +123,16 @@ if (!$hasil) {
 <head>
 
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <title>Tindakan Pelanggaran Siswa</title>
 
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
           rel="stylesheet">
 
     <!-- DataTables -->
@@ -191,7 +162,6 @@ if (!$hasil) {
                 Kembali ke Dashboard
             </a>
 
-
             <!-- PESAN SUKSES -->
             <?php if (isset($_SESSION['pesan_sukses'])) { ?>
 
@@ -203,7 +173,6 @@ if (!$hasil) {
                 </div>
 
             <?php } ?>
-
 
             <!-- PESAN ERROR -->
             <?php if (isset($_SESSION['pesan_error'])) { ?>
@@ -217,13 +186,22 @@ if (!$hasil) {
 
             <?php } ?>
 
-
             <!-- DATA PELANGGARAN -->
             <div class="card">
 
-                <div class="card-header bg-primary text-white">
+                <!-- HEADER DENGAN TOMBOL CETAK -->
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
 
                     <strong>Data Pelanggaran yang Belum Ditindak</strong>
+
+                    <a href="cetak_tindakan.php"
+                       target="_blank"
+                       class="btn btn-light btn-sm">
+
+                        <i class="bi bi-printer"></i>
+                        Cetak Laporan
+
+                    </a>
 
                 </div>
 
@@ -257,10 +235,11 @@ if (!$hasil) {
                             <?php while ($row = mysqli_fetch_assoc($hasil)) { ?>
 
                                 <?php
-                                // Tentukan tindakan otomatis
                                 $tindakanOtomatis = tentukanTindakan(
                                     $row['nama_pelanggaran']
                                 );
+
+                                $formId = 'formTindakan' . (int) $row['id'];
                                 ?>
 
                                 <tr>
@@ -286,11 +265,9 @@ if (!$hasil) {
                                     </td>
 
                                     <td class="text-center">
-
                                         <span class="badge bg-warning text-dark">
                                             <?php echo htmlspecialchars($row['poin'] ?? '0'); ?>
                                         </span>
-
                                     </td>
 
                                     <td>
@@ -300,26 +277,30 @@ if (!$hasil) {
                                     <!-- TINDAKAN OTOMATIS -->
                                     <td style="min-width: 280px;">
 
-                                        <form method="POST"
-                                              action="tindakan.php">
-
-                                            <input type="hidden"
-                                                   name="id"
-                                                   value="<?php echo $row['id']; ?>">
-
-                                            <textarea
-                                                name="tindakan"
-                                                class="form-control"
-                                                rows="2"
-                                                required><?php echo htmlspecialchars($tindakanOtomatis); ?></textarea>
+                                        <textarea
+                                            name="tindakan"
+                                            form="<?php echo $formId; ?>"
+                                            class="form-control"
+                                            rows="2"
+                                            required><?php echo htmlspecialchars($tindakanOtomatis); ?></textarea>
 
                                     </td>
 
+                                    <!-- AKSI -->
                                     <td>
+
+                                        <form method="POST"
+                                              action="tindakan.php"
+                                              id="<?php echo $formId; ?>">
+
+                                            <input type="hidden"
+                                                   name="id"
+                                                   value="<?php echo (int) $row['id']; ?>">
 
                                             <button type="submit"
                                                     class="btn btn-success btn-sm">
 
+                                                <i class="bi bi-save"></i>
                                                 Simpan
 
                                             </button>
@@ -347,7 +328,6 @@ if (!$hasil) {
     </div>
 
 </div>
-
 
 <!-- JQuery -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
