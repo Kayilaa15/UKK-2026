@@ -1,6 +1,6 @@
-
 <?php
 // catat_pelanggaran.php
+
 include 'includes/cek_session.php';
 include 'config/koneksi.php';
 
@@ -73,7 +73,6 @@ if ($tahun_aktif) {
             'tingkat' => $data['tingkat'],
             'jurusan' => $data['jurusan']
         ];
-
     }
 }
 
@@ -91,7 +90,7 @@ $pelanggaran = mysqli_query(
 // ==========================================
 // GURU YANG SEDANG LOGIN
 // ==========================================
-$id_user = (int) $_SESSION['id'];
+$id_user = (int) ($_SESSION['id'] ?? 0);
 
 $stmt_guru = mysqli_prepare(
     $koneksi,
@@ -160,11 +159,16 @@ $hasil = mysqli_query($koneksi, $sql);
 
     <title>Catat Pelanggaran Siswa</title>
 
+    <!-- BOOTSTRAP 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
           rel="stylesheet">
 
     <!-- TOM SELECT -->
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/css/tom-select.bootstrap5.min.css"
+          rel="stylesheet">
+
+    <!-- DATATABLES BOOTSTRAP 5 -->
+    <link href="https://cdn.datatables.net/2.3.4/css/dataTables.bootstrap5.min.css"
           rel="stylesheet">
 
 </head>
@@ -223,11 +227,14 @@ $hasil = mysqli_query($koneksi, $sql);
 
             <?php } ?>
 
+            <!-- ================================== -->
             <!-- FORM CATAT PELANGGARAN -->
-            <div class="card mb-4">
+            <!-- ================================== -->
+
+            <div class="card mb-4 shadow-sm">
 
                 <div class="card-header">
-                    Form Catat Pelanggaran
+                    <h5 class="mb-0">Form Catat Pelanggaran</h5>
                 </div>
 
                 <div class="card-body">
@@ -366,7 +373,22 @@ $hasil = mysqli_query($koneksi, $sql);
 
                             </div>
 
-                           
+                            <!-- POIN OTOMATIS -->
+                            <div class="col-md-6 mb-3">
+
+                                <label class="form-label">
+                                    Poin
+                                </label>
+
+                                <input type="number"
+                                       name="poin"
+                                       id="poin"
+                                       class="form-control"
+                                       placeholder="Poin otomatis terisi"
+                                       readonly
+                                       required>
+
+                            </div>
 
                             <!-- TANGGAL -->
                             <div class="col-md-6 mb-3">
@@ -447,18 +469,22 @@ $hasil = mysqli_query($koneksi, $sql);
 
             </div>
 
+            <!-- ================================== -->
             <!-- TABEL DATA PELANGGARAN -->
-            <div class="card">
+            <!-- ================================== -->
+
+            <div class="card shadow-sm">
 
                 <div class="card-header">
-                    Data Catatan Pelanggaran
+                    <h5 class="mb-0">Data Catatan Pelanggaran</h5>
                 </div>
 
                 <div class="card-body">
 
                     <div class="table-responsive">
 
-                        <table class="table table-bordered table-striped">
+                        <table id="tabelPelanggaran"
+                               class="table table-bordered table-striped table-hover align-middle w-100">
 
                             <thead class="table-dark">
 
@@ -482,96 +508,100 @@ $hasil = mysqli_query($koneksi, $sql);
 
                                 <?php $no = 1; ?>
 
-                                <?php while ($row = mysqli_fetch_assoc($hasil)) { ?>
+                                <?php if ($hasil && mysqli_num_rows($hasil) > 0) { ?>
 
-                                    <tr>
+                                    <?php while ($row = mysqli_fetch_assoc($hasil)) { ?>
 
-                                        <td>
-                                            <?= $no++; ?>
-                                        </td>
+                                        <tr>
 
-                                        <td>
-                                            <?= htmlspecialchars($row['nama_siswa'] ?? '-'); ?>
-                                        </td>
+                                            <td>
+                                                <?= $no++; ?>
+                                            </td>
 
-                                        <td>
-                                            <?= htmlspecialchars($row['nama_kelas'] ?? '-'); ?>
-                                        </td>
+                                            <td>
+                                                <?= htmlspecialchars($row['nama_siswa'] ?? '-'); ?>
+                                            </td>
 
-                                        <td>
-                                            <?= htmlspecialchars($row['tahun_ajaran'] ?? '-'); ?>
-                                        </td>
+                                            <td>
+                                                <?= htmlspecialchars($row['nama_kelas'] ?? '-'); ?>
+                                            </td>
 
-                                        <td>
-                                            <?= htmlspecialchars($row['nama_pelanggaran'] ?? '-'); ?>
-                                        </td>
+                                            <td>
+                                                <?= htmlspecialchars($row['tahun_ajaran'] ?? '-'); ?>
+                                            </td>
 
-                                        <td>
-                                            <?= htmlspecialchars($row['nama_guru'] ?? '-'); ?>
-                                        </td>
+                                            <td>
+                                                <?= htmlspecialchars($row['nama_pelanggaran'] ?? '-'); ?>
+                                            </td>
 
-                                        <td>
-                                            <?= htmlspecialchars($row['tanggal'] ?? '-'); ?>
-                                        </td>
+                                            <td>
+                                                <?= htmlspecialchars($row['nama_guru'] ?? '-'); ?>
+                                            </td>
 
-                                        <td>
+                                            <td>
+                                                <?= htmlspecialchars($row['tanggal'] ?? '-'); ?>
+                                            </td>
 
-                                            <?php if ($row['status'] == 'Selesai') { ?>
+                                            <td>
 
-                                                <span class="badge bg-success">
-                                                    Selesai
-                                                </span>
+                                                <?php if ($row['status'] == 'Selesai') { ?>
 
-                                            <?php } elseif ($row['status'] == 'Proses') { ?>
+                                                    <span class="badge bg-success">
+                                                        Selesai
+                                                    </span>
 
-                                                <span class="badge bg-warning text-dark">
-                                                    Proses
-                                                </span>
+                                                <?php } elseif ($row['status'] == 'Proses') { ?>
 
-                                            <?php } else { ?>
+                                                    <span class="badge bg-warning text-dark">
+                                                        Proses
+                                                    </span>
 
-                                                <span class="badge bg-primary">
-                                                    Ditindaklanjuti
-                                                </span>
+                                                <?php } else { ?>
 
-                                            <?php } ?>
+                                                    <span class="badge bg-primary">
+                                                        Ditindaklanjuti
+                                                    </span>
 
-                                        </td>
+                                                <?php } ?>
 
-                                        <td>
+                                            </td>
 
-                                            <?php if ($row['status'] != 'Selesai') { ?>
+                                            <td>
 
-                                                <div class="d-flex gap-2">
+                                                <?php if ($row['status'] != 'Selesai') { ?>
 
-                                                    <a href="edit_catat_pelanggaran.php?id=<?= (int) $row['id']; ?>"
-                                                       class="btn btn-warning btn-sm">
+                                                    <div class="d-flex gap-2">
 
-                                                        Edit
+                                                        <a href="edit_catat_pelanggaran.php?id=<?= (int) $row['id']; ?>"
+                                                           class="btn btn-warning btn-sm">
 
-                                                    </a>
+                                                            Edit
 
-                                                    <a href="hapus_catat_pelanggaran.php?id=<?= (int) $row['id']; ?>"
-                                                       class="btn btn-danger btn-sm"
-                                                       onclick="return confirm('Yakin ingin menghapus catatan pelanggaran ini?');">
+                                                        </a>
 
-                                                        Hapus
+                                                        <a href="hapus_catat_pelanggaran.php?id=<?= (int) $row['id']; ?>"
+                                                           class="btn btn-danger btn-sm"
+                                                           onclick="return confirm('Yakin ingin menghapus catatan pelanggaran ini?');">
 
-                                                    </a>
+                                                            Hapus
 
-                                                </div>
+                                                        </a>
 
-                                            <?php } else { ?>
+                                                    </div>
 
-                                                <span class="text-muted">
-                                                    Tidak tersedia
-                                                </span>
+                                                <?php } else { ?>
 
-                                            <?php } ?>
+                                                    <span class="text-muted">
+                                                        Tidak tersedia
+                                                    </span>
 
-                                        </td>
+                                                <?php } ?>
 
-                                    </tr>
+                                            </td>
+
+                                        </tr>
+
+                                    <?php } ?>
 
                                 <?php } ?>
 
@@ -592,6 +622,20 @@ $hasil = mysqli_query($koneksi, $sql);
 </div>
 
 
+<!-- ========================================== -->
+<!-- JAVASCRIPT -->
+<!-- ========================================== -->
+
+<!-- BOOTSTRAP 5 -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- JQUERY -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<!-- DATATABLES -->
+<script src="https://cdn.datatables.net/2.3.4/js/dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/2.3.4/js/dataTables.bootstrap5.min.js"></script>
+
 <!-- TOM SELECT -->
 <script src="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/js/tom-select.complete.min.js"></script>
 
@@ -600,6 +644,7 @@ $hasil = mysqli_query($koneksi, $sql);
 // ==========================================
 // DATA PENEMPATAN SISWA DARI PHP
 // ==========================================
+
 const dataPenempatan = <?= json_encode(
     $daftar_penempatan,
     JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP
@@ -607,8 +652,53 @@ const dataPenempatan = <?= json_encode(
 
 
 // ==========================================
+// DATATABLES CATATAN PELANGGARAN
+// ==========================================
+
+$(document).ready(function () {
+
+    $('#tabelPelanggaran').DataTable({
+
+        language: {
+            search: "Cari:",
+            lengthMenu: "Tampilkan _MENU_ data",
+            info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+            infoEmpty: "Menampilkan 0 sampai 0 dari 0 data",
+            infoFiltered: "(difilter dari _MAX_ total data)",
+            zeroRecords: "Data pelanggaran tidak ditemukan",
+            emptyTable: "Belum ada data catatan pelanggaran",
+
+            paginate: {
+                first: "Pertama",
+                last: "Terakhir",
+                next: "Berikutnya",
+                previous: "Sebelumnya"
+            }
+        },
+
+        pageLength: 10,
+
+        lengthMenu: [5, 10, 25, 50, 100],
+
+        order: [[0, 'asc']],
+
+        columnDefs: [
+            {
+                targets: 8,
+                orderable: false,
+                searchable: false
+            }
+        ]
+
+    });
+
+});
+
+
+// ==========================================
 // PENCARIAN SISWA DAN KELAS OTOMATIS
 // ==========================================
+
 const pilihanSiswa = new TomSelect("#siswa", {
 
     create: false,
@@ -652,6 +742,7 @@ const pilihanSiswa = new TomSelect("#siswa", {
 // PENCARIAN JENIS PELANGGARAN
 // DAN POIN OTOMATIS
 // ==========================================
+
 const pilihanPelanggaran = new TomSelect("#pelanggaran", {
 
     create: false,
@@ -678,6 +769,7 @@ const pilihanPelanggaran = new TomSelect("#pelanggaran", {
 // ==========================================
 // VALIDASI SEBELUM SIMPAN
 // ==========================================
+
 document.getElementById('formPelanggaran')
 .addEventListener('submit', function(e) {
 
